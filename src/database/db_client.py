@@ -20,56 +20,77 @@ class DBClient:
         params = params or ()
         logger.info(f"DB QUERY: {query} | Params: {params}")
         
-        with self._get_connection() as conn:
+        conn = self._get_connection()
+        try:
             cursor = conn.cursor()
             cursor.execute(query, params)
             rows = cursor.fetchall()
             return [dict(row) for row in rows]
+        finally:
+            conn.close()
 
     def execute_scalar(self, query: str, params: Optional[tuple] = None) -> Optional[Any]:
         """Executes a query and returns the first column of the first row (e.g. COUNT(*))."""
         params = params or ()
         logger.info(f"DB SCALAR QUERY: {query} | Params: {params}")
         
-        with self._get_connection() as conn:
+        conn = self._get_connection()
+        try:
             cursor = conn.cursor()
             cursor.execute(query, params)
             row = cursor.fetchone()
             if row:
                 return row[0]
             return None
+        finally:
+            conn.close()
 
     def execute_fetchone(self, query: str, params: Optional[tuple] = None) -> Optional[Dict[str, Any]]:
         """Executes a query and returns a single row dictionary, or None."""
         params = params or ()
         logger.info(f"DB FETCHONE QUERY: {query} | Params: {params}")
         
-        with self._get_connection() as conn:
+        conn = self._get_connection()
+        try:
             cursor = conn.cursor()
             cursor.execute(query, params)
             row = cursor.fetchone()
             if row:
                 return dict(row)
             return None
+        finally:
+            conn.close()
 
     def execute_write(self, query: str, params: Optional[tuple] = None) -> int:
         """Executes an INSERT, UPDATE, or DELETE query and commits. Returns affected row count."""
         params = params or ()
         logger.info(f"DB WRITE QUERY: {query} | Params: {params}")
         
-        with self._get_connection() as conn:
+        conn = self._get_connection()
+        try:
             cursor = conn.cursor()
             cursor.execute(query, params)
             conn.commit()
             return cursor.rowcount
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
             
     def clear_tables(self):
         """Clears all data from database tables."""
         logger.info("Clearing all records from database tables.")
-        with self._get_connection() as conn:
+        conn = self._get_connection()
+        try:
             cursor = conn.cursor()
             cursor.execute("DELETE FROM orders;")
             cursor.execute("DELETE FROM products;")
             # Reset sqlite_sequence for autoincrement ids
             cursor.execute("DELETE FROM sqlite_sequence WHERE name IN ('products', 'orders');")
             conn.commit()
+        except Exception as e:
+            conn.rollback()
+            raise e
+        finally:
+            conn.close()
