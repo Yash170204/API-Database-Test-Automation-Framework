@@ -230,7 +230,7 @@ The continuous integration pipeline is defined in `.github/workflows/tests.yml`.
 
 ## Screenshots / Demo
 
-*Note: Once you run the tests and capture execution images, save them in the `screenshots/` folder to populate this section. See [SCREENSHOTS.md](file:///d:/Projects/API%20testing/docs/SCREENSHOTS.md) for details.*
+
 
 ### 1. Full Automated Test Suite Passing
 ![Full Test Suite](screenshots/test-suite-passed.png)
