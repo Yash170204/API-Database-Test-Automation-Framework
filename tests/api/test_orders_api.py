@@ -75,7 +75,7 @@ def test_create_order_insufficient_stock_fails(api_client, clean_db, test_produc
     "plainaddress",
     "#@%^%#$@#$@#.com",
     "@example.com",
-    "Joe Smith <email@example.com>",
+    "Joe Smith email@example.com",
     "email.example.com",
     "email@example@example.com"
 ])

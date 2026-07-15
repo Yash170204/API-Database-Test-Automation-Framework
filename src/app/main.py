@@ -3,29 +3,33 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
 import os
 import sqlite3
+from contextlib import asynccontextmanager
 from src.app.database import get_db_connection, init_db
-
-app = FastAPI(
-    title="Product Inventory & Order API",
-    description="A lightweight API for inventory and order management, designed for API & Database testing.",
-    version="1.0.0"
-)
 
 # Get database path from environment variable
 DB_PATH = os.getenv("DATABASE_PATH", "inventory.db")
 
-# Initialize database on startup
-@app.on_event("startup")
-def startup_event():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup code: Initialize database
     init_db(DB_PATH)
+    yield
+    # Teardown code (if any needed in future)
+
+app = FastAPI(
+    title="Product Inventory & Order API",
+    description="A lightweight API for inventory and order management, designed for API & Database testing.",
+    version="1.0.0",
+    lifespan=lifespan
+)
 
 # --- Pydantic Schemas ---
 class ProductBase(BaseModel):
-    name: str = Field(..., min_length=1, max_length=100, example="Wireless Mouse")
-    sku: str = Field(..., min_length=3, max_length=50, example="TECH-MOU-001")
-    price: float = Field(..., gt=0.0, example=29.99)
-    stock: int = Field(..., ge=0, example=150)
-    category: str = Field(..., min_length=1, max_length=50, example="Electronics")
+    name: str = Field(..., min_length=1, max_length=100, examples=["Wireless Mouse"])
+    sku: str = Field(..., min_length=3, max_length=50, examples=["TECH-MOU-001"])
+    price: float = Field(..., gt=0.0, examples=[29.99])
+    stock: int = Field(..., ge=0, examples=[150])
+    category: str = Field(..., min_length=1, max_length=50, examples=["Electronics"])
 
 class ProductCreate(ProductBase):
     pass
@@ -41,9 +45,9 @@ class ProductResponse(ProductBase):
     id: int
 
 class OrderCreate(BaseModel):
-    product_id: int = Field(..., example=1)
-    quantity: int = Field(..., gt=0, example=2)
-    customer_email: EmailStr = Field(..., example="buyer@example.com")
+    product_id: int = Field(..., examples=[1])
+    quantity: int = Field(..., gt=0, examples=[2])
+    customer_email: EmailStr = Field(..., examples=["buyer@example.com"])
 
 class OrderResponse(BaseModel):
     id: int
@@ -66,7 +70,7 @@ def create_product(product: ProductCreate):
         )
         conn.commit()
         product_id = cursor.lastrowid
-        return {**product.dict(), "id": product_id, "sku": product.sku.upper()}
+        return {**product.model_dump(), "id": product_id, "sku": product.sku.upper()}
     except sqlite3.IntegrityError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -132,7 +136,7 @@ def update_product(product_id: int, product: ProductUpdate):
             detail=f"Product with ID {product_id} not found."
         )
         
-    update_data = product.dict(exclude_unset=True)
+    update_data = product.model_dump(exclude_unset=True)
     if not update_data:
         conn.close()
         return dict(existing_row)
