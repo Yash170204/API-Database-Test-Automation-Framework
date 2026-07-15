@@ -50,11 +50,11 @@ This framework solves that problem by implementing **dual-layer verification**:
 ```mermaid
 graph TD
     subgraph Test Automation Framework
-        Pytest[Pytest Runner]
-        Client[API Client (requests)]
-        DBClient[DB Client (sqlite3)]
-        Logger[Logger]
-        Schema[Schema Validator]
+        Pytest["Pytest Runner"]
+        Client["API Client (requests)"]
+        DBClient["DB Client (sqlite3)"]
+        Logger["Logger"]
+        Schema["Schema Validator"]
         
         Pytest --> Client
         Pytest --> DBClient
@@ -64,8 +64,8 @@ graph TD
     end
 
     subgraph Service Under Test
-        API[FastAPI Service]
-        DB[(SQLite Database)]
+        API["FastAPI Service"]
+        DB[("SQLite Database")]
         
         API --> DB
     end
