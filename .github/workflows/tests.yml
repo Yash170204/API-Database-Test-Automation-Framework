@@ -33,6 +33,7 @@ jobs:
       env:
         TEST_ENV: ci
         DATABASE_PATH: test_inventory.db
+        PYTHONPATH: .
       run: |
         pytest -v --html=reports/report.html --self-contained-html
         
