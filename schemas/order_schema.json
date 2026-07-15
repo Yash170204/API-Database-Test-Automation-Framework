@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OrderResponse",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "product_id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "quantity": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "total_price": {
+      "type": "number",
+      "exclusiveMinimum": 0.0
+    },
+    "customer_email": {
+      "type": "string",
+      "format": "email"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PENDING", "PAID", "SHIPPED", "CANCELLED"]
+    }
+  },
+  "required": ["id", "product_id", "quantity", "total_price", "customer_email", "status"],
+  "additionalProperties": false
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProductResponse",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "sku": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_-]{3,50}$"
+    },
+    "price": {
+      "type": "number",
+      "exclusiveMinimum": 0.0
+    },
+    "stock": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 50
+    }
+  },
+  "required": ["id", "name", "sku", "price", "stock", "category"],
+  "additionalProperties": false
+}
